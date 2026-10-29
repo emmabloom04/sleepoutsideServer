@@ -8,7 +8,7 @@ export interface FindProductObj {
   search: {
     name?:string,
     descriptionHtmlSimple?:string,
-    category?:string,
+    category?:Product["category"],
   },
   limit: number,
   offset: number,
