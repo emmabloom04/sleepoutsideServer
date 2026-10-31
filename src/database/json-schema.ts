@@ -1,3 +1,11 @@
+import type { JSONSchema7 } from "json-schema";
+// This extends the library's type definition to include your custom keyword
+declare module "json-schema" {
+  export interface JSONSchema7 {
+    instanceof?: string | string[];
+  }
+}
+
 // Product schema
 export interface Product {
   _id: string;
@@ -173,3 +181,15 @@ export interface Alert {
   createdAt: Date;
   modifiedAt: Date;
 }
+
+export const UserSchema: JSONSchema7 = {
+  type: "object",
+  properties: {
+    email: { type: "string", format: "email" },
+    password: { type: "string" },
+    name: { type: "string" },
+    createdAt: { instanceof: "Date" },
+    modifiedAt: { instanceof: "Date" }
+  },
+  required: ["email", "password", "name", "createdAt", "modifiedAt"]
+};

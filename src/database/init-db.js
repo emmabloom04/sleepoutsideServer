@@ -114,6 +114,20 @@ const init = async () => {
       createdAt: new Date(),
       updatedAt: new Date(),
     });
+    const user = {
+      email: "test@test.com",
+      password: await argon2.hash("password"),
+      name: "Test User",
+      createdAt: new Date(),
+      modifiedAt: new Date()
+  };
+  try {
+    // insert the user
+    const result = await db.collection("users").insertOne(user);
+    console.log(`New user created with the following id: ${result.insertedId}`);
+  } catch (error) {
+    console.error(error.message);
+  }
 
     // indexes for products
     await db.collection("products").createIndex({ name: 1 });
