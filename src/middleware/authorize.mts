@@ -2,7 +2,7 @@ import type { Request, Response, NextFunction  } from 'express';
 import jwt from 'jsonwebtoken';
 
 // Define constants for secret key and token expiration time
-const SECRET_KEY = process.env.JWT_SECRET  || 'your-secret-key'; 
+const SECRET_KEY = process.env.JWT_SECRET  || 'secret'; 
 
 // Create a middleware function to verify JWT tokens
 function authorize(req: Request, res: Response, next: NextFunction) {
