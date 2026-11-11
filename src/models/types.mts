@@ -200,3 +200,9 @@ export interface Alert {
   createdAt: Date;
   modifiedAt: Date;
 }
+
+export interface Subscriber {
+  _id: string;
+  email: string;
+  name: string;
+}
