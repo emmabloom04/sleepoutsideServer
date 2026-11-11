@@ -182,6 +182,16 @@ export interface Alert {
   modifiedAt: Date;
 }
 
+export const SubscriberSchema: JSONSchema7 = {
+  type: "object",
+  properties: {
+    email: { type: "string", format: "email" },
+    name: { type: "string" },
+  },
+  required: ["email", "name"],
+  additionalProperties: false
+}
+
 export const UserSchema: JSONSchema7 = {
   type: "object",
   properties: {
