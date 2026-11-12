@@ -12,12 +12,10 @@ import {buildPaginationWrapper, formatFields} from './utils.mts'
     
   find.fieldFilters = fields? formatFields(fields): undefined;
   if(category) {
-      find.search.category = category;
+      find.search.category = category as Product["category"];
   }
-  if(q) {
-      find.search.name = q;
-      find.search.descriptionHtmlSimple = q;
-  }
+
+
   // now that we know what we have send it to the model and get the results.
  const data = await productModel.getAllProducts(find);
  // take the results and format them correctly
@@ -31,7 +29,23 @@ const getProductById = async (id: string) => {
   return await productModel.getProductById(id);
 };
 
+const searchProducts = async (query: QueryParams) => {
+  const find: FindProductObj = {
+    search: {}, // the model replaces this with the $or filter
+    limit: query.limit ? parseInt(query.limit) : 20,
+    offset: query.offset ? parseInt(query.offset) : 0,
+    fieldFilters: query.fields ? formatFields(query.fields) : undefined,
+  };
+
+  const data = await productModel.searchProducts(query.q?.trim() ?? "", find);
+
+  const wrapper = buildPaginationWrapper(data.totalCount, query);
+  wrapper.results = data.results;
+  return wrapper;
+};
+
 export default {
   getAllProducts,
-  getProductById
+  getProductById,
+  searchProducts
 };

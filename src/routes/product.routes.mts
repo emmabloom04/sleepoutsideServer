@@ -27,6 +27,22 @@ router.get("/", async (req, res, next) => {
 }
 });
 
+// GET /products/search?q=
+router.get("/search", async (req, res, next) => {
+  const cleanQuery = sanitize(req.query);
+  try {
+    if (!cleanQuery.q?.trim()) {
+      return next(new EntityNotFoundError({message : 'Search query (q) required', code: 'ERR_VALID',
+        statusCode : 400}))
+    }
+
+    const results = await productService.searchProducts(cleanQuery);
+    res.status(200).json(results);
+  } catch (error) {
+    next(error);
+  }
+});
+
 // GET /products/:id
 router.get("/:id", async (req, res, next) => {
   
