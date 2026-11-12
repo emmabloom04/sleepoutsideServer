@@ -1,7 +1,7 @@
 import mongodb from "../database/index.mts";
 import type {Product, FindProductObj} from "./types.mts";
 import { formatFields } from "../services/utils.mts";
-import type { Collection } from "mongodb";
+import type { Collection, Filter } from "mongodb";
 
 export async function getAllProducts(find:FindProductObj) {
     // get a reference to our Products collection
@@ -16,7 +16,7 @@ export async function getAllProducts(find:FindProductObj) {
     }
     // finally convert the result to an array that we can consume
     const results = await cursor.toArray();
-    console.log(totalCount, results)
+    // console.log(totalCount, results)
         return {results, totalCount};
 }
 
@@ -25,7 +25,26 @@ async function getProductById(id: string): Promise<Product | null> {
     return product;
 }
 
+function escapeRegex(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+async function searchProducts(query: string, find: FindProductObj) {
+  const regex = new RegExp(escapeRegex(query), "i");
+
+  const searchFilter: Filter<Product> = {
+    $or: [
+      { category: regex },
+      { name: regex },
+      { descriptionHtmlSimple: regex },
+    ],
+  };
+
+  return getAllProducts({ ...find, search: searchFilter });
+}
+
 export default {
     getAllProducts,
-    getProductById
+    getProductById,
+    searchProducts
 };
