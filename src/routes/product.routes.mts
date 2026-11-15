@@ -2,6 +2,7 @@ import {Router } from "express";
 import productService from "../services/product.service.mts";
 import EntityNotFoundError from "../errors/EntityNotFoundError.mts";
 import { buildPaginationWrapper, sanitize } from "../services/utils.mts";
+import { resolveObjectURL } from "buffer";
 
 const router: Router = Router();
 
@@ -41,6 +42,32 @@ router.get("/search", async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+});
+
+router.get("/recommended/:id", async (req, res, next) => {
+  const {id} = req.params;
+  
+  try {
+    const recommendations = await productService.recommendedProducts(id);
+
+    if (!recommendations) {
+      return next(
+        new EntityNotFoundError({
+          message: `Product ${id} Not Found`,
+          code: "ERR_NF",
+          statusCode: 404,
+        })
+      );
+    }
+
+    return res.status(200).json({
+      count: recommendations.length,
+      results: recommendations,
+    });
+  } catch (error) {
+    next(error);
+  }
+
 });
 
 // GET /products/:id
