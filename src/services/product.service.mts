@@ -43,9 +43,43 @@ const searchProducts = async (query: QueryParams) => {
   wrapper.results = data.results;
   return wrapper;
 };
+const recommendedProducts = async (id:string): Promise<Product[] | null> => {
+  const sourceProduct = await productModel.getProductById(id);
+  if (!sourceProduct) return null;
+
+  const { sameCategory, differentCategory } =
+    await productModel.getRecommendationCandidates(
+      sourceProduct.category,
+      sourceProduct.id
+    );
+
+  const recommendations: Product[] = [];
+  const selectedIds = new Set<string>([sourceProduct.id]);
+
+  const addRecommendation = (product: Product | undefined) => {
+    if (!product || selectedIds.has(product.id)) return;
+
+    selectedIds.add(product.id);
+    recommendations.push(product);
+  };
+
+  addRecommendation(sameCategory[0]);
+  addRecommendation(differentCategory[0]);
+
+  // Only add the optional third product after both required picks are present.
+  if (recommendations.length === 2) {
+    for (const candidate of [...sameCategory, ...differentCategory]) {
+      if (recommendations.length === 3) break;
+      addRecommendation(candidate);
+    }
+  }
+
+  return recommendations;
+}
 
 export default {
   getAllProducts,
   getProductById,
-  searchProducts
+  searchProducts,
+  recommendedProducts
 };
