@@ -43,8 +43,27 @@ async function searchProducts(query: string, find: FindProductObj) {
   return getAllProducts({ ...find, search: searchFilter });
 }
 
+async function getRecommendationCandidates(category:Product["category"], excludedId:string): Promise<{ sameCategory: Product[]; differentCategory: Product[] }>
+{
+  const products = mongodb.getDb().collection<Product>("products");
+
+  const [sameCategory, differentCategory] = await Promise.all([
+    products
+      .find({ category, id: { $ne: excludedId } })
+      .limit(3)
+      .toArray(),
+    products
+      .find({ category: { $ne: category }, id: { $ne: excludedId } })
+      .limit(3)
+      .toArray(),
+  ]);
+
+  return { sameCategory, differentCategory };
+}
+
 export default {
     getAllProducts,
     getProductById,
-    searchProducts
+    searchProducts,
+    getRecommendationCandidates
 };
