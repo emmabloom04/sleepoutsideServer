@@ -40,5 +40,20 @@ router.get('/protected', authorize, (req, res) => {
     console.log(res.locals.user)
   res.json({ message: `Hello, ${res.locals.user.email}!` });
 });
+
+// keep this LAST: "/:id" matches any single path segment, so it has to come after fixed paths like "/protected"
+router.get("/:id", authorize, async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    // users can only read their own profile
+    if (id !== res.locals.user.id) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+    const profile = await userService.getProfile(id);
+    res.json(profile);
+  } catch (err) {
+    next(err);
+  }
+});
  
 export default router

@@ -4,6 +4,7 @@ import swaggerRoutes from "./swagger.routes.mts";
 import userRoutes from "./user.routes.mts";
 import alertRoutes from "./alert.routes.mts";
 import subscriberRoutes from "./subscriber.routes.mts";
+import orderRoutes from "./order.routes.mts";
 
 const router:Router = Router();
 
@@ -17,7 +18,7 @@ router.use("/products", productRoutes);
 router.use("/users", userRoutes);
 router.use("/alerts", alertRoutes);
 router.use("/subscribers", subscriberRoutes);
-
+router.use("/orders", orderRoutes);
 // load swagger routes
 router.use(swaggerRoutes);
 
