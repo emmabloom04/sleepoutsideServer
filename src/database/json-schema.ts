@@ -158,11 +158,11 @@ export interface CartItem {
 export interface Order {
   _id: string;
   userId: string;
-  name: string,
+  name: string;
   status: "pending" | "processing" | "shipped" | "delivered";
   cardNumber: string;
-    cardExpiration: string;
-    cardCode: number;
+  cardExpiration: string;
+  cardCode: string;
   shippingAddress: Address;
   orderItems: CartItem[];
   createdAt: Date;
@@ -202,4 +202,49 @@ export const UserSchema: JSONSchema7 = {
     modifiedAt: { instanceof: "Date" }
   },
   required: ["email", "password", "name", "createdAt", "modifiedAt"]
+};
+
+export const OrderSchema: JSONSchema7 = {
+  type: "object",
+  properties: {
+    name: { type: "string", minLength: 1 },
+    cardNumber: { type: "string", pattern: "^\\d{12}$" },
+    cardCode: { type: "string", pattern: "^\\d{3}$" },
+    cardExpiration: { type: "string", pattern: "^(0[1-9]|1[0-2])/\\d{2}$" },
+    shippingAddress: {
+      type: "object",
+      properties: {
+        street: { type: "string", minLength: 10, maxLength: 100 },
+        city: { type: "string", minLength: 5, maxLength: 50 },
+        state: {
+          type: "string",
+          enum: [
+            "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "DC", "FL",
+            "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME",
+            "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH",
+            "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI",
+            "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"
+          ]
+        },
+        zipCode: { type: "string", pattern: "^\\d{5}(-\\d{4})?$" },
+        country: { type: "string", minLength: 2, maxLength: 30, pattern: "^\\w+$" },
+      },
+      required: ["street", "city", "state", "zipCode", "country"],
+    },
+    orderItems: { type: "array", minItems: 1 },
+    totalPrice: { type: "number" },
+    shippingCost: { type: "number" },
+    taxAmount: { type: "number" },
+  },
+  required: [
+    "name",
+    "cardNumber",
+    "cardCode",
+    "cardExpiration",
+    "shippingAddress",
+    "orderItems",
+    "totalPrice",
+    "shippingCost",
+    "taxAmount",
+  ],
 };

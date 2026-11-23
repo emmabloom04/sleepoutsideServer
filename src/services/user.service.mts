@@ -50,7 +50,20 @@ async function register(email:string, password:string, name:string) {
     return userModel.createUser(newUser)
 }
 
+async function getProfile(id: string) {
+    const user = await userModel.getUserById(id);
+    if (!user) throw new EntityNotFoundError({ message: "User not found", statusCode: 404 });
+    // build the response from an allowlist so the password hash can never leak
+    return {
+        _id: user._id.toString(),
+        name: user.name,
+        email: user.email,
+        address: user.address ?? null
+    };
+}
+
 export default {
     login,
-    register
+    register,
+    getProfile
 }
